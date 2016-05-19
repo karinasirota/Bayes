@@ -28,6 +28,20 @@ class Bayes_Classifier:
                 #print star
                 review = self.loadFile("movies_reviews/"+fileName)
                 token = self.tokenize(review)
+                if (star == '5'):
+                    for word in token:
+                        posEntry = {word: 1}
+                        if word in posDict:
+                            posDict[word] += 1
+                        else:
+                            posDict.update(posEntry)
+                else:
+                    for word in token:
+                        negEntry = {word: 1}
+                        if word in negDict:
+                            negDict[word] += 1
+                        else:
+                            negDict.update(negEntry)
                 test = [i+' '+j for i,j in zip(token[::2], token[1::2])]
                 if (star == '5'):
                     for word in test:
@@ -56,10 +70,10 @@ class Bayes_Classifier:
         negProb = float(0)
         total = float(13864)
         token = self.tokenize(sText)
+        test = [i+' '+j for i,j in zip(token[::2], token[1::2])]
         if (len(token)%2 == 1):
-           test = token
-        else:
-            test = [i+' '+j for i,j in zip(token[::2], token[1::2])]
+           test.append(token[len(token) - 1])
+
         for word in test:
             if word in posDict:
                 if (posProb == float(0)):
