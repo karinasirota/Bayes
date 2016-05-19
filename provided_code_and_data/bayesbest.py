@@ -1,12 +1,13 @@
 # Name: Rosalie Chan (rmc982) and Karina Sirota (kss118)
 # Date: May 22, 2016
 # Description:
-#All group members were present and contributing during all work on this project
+# All group members were present and contributing during all work on this project
 #
 
 import math, os, pickle, re
 
-
+posDict = {}
+negDict = {}
 class Bayes_Classifier:
     
     def __init__(self):
@@ -14,12 +15,11 @@ class Bayes_Classifier:
       cache of a trained classifier has been stored, it loads this cache.  Otherwise, 
       the system will proceed through training.  After running this method, the classifier 
       is ready to classify input text."""
-        posDict = {}
-        negDict = {}
         self.train()
     
     def train(self):
         """Trains the Naive Bayes Sentiment Classifier."""
+        
         IFileList = []
         for fFileObj in os.walk("movies_reviews/"):
             IFileList = fFileObj[2]
@@ -27,17 +27,17 @@ class Bayes_Classifier:
                 star = fileName[7]
                 #print star
                 review = self.loadFile("movies_reviews/"+fileName)
+                token = self.tokenize(review)
+                test = [i+' '+j for i,j in zip(token[::2], token[1::2])]
                 if (star == '5'):
-                    posToken = self.tokenize(review)
-                    for word in posToken:
+                    for word in test:
                         posEntry = {word: 1}
                         if word in posDict:
                             posDict[word] += 1
                         else:
                             posDict.update(posEntry)
                 else:
-                    negToken = self.tokenize(review)
-                    for word in negToken:
+                    for word in test:
                         negEntry = {word: 1}
                         if word in negDict:
                             negDict[word] += 1
@@ -56,21 +56,25 @@ class Bayes_Classifier:
         negProb = float(0)
         total = float(13864)
         token = self.tokenize(sText)
-        for word in token:
+        if (len(token)%2 == 1):
+           test = token
+        else:
+            test = [i+' '+j for i,j in zip(token[::2], token[1::2])]
+        for word in test:
             if word in posDict:
                 if (posProb == float(0)):
                     posProb = float(1)
-                print "negProb", negProb
-                print "posProb", posProb
+                # print "negProb", negProb
+                # print "posProb", posProb
                 posProb *= float(posDict[word] / total)
-                print "newposProb", negProb
+                # print "newposProb", negProb
             if word in negDict:
                 if (negProb == float(0)):
                     negProb = float(1)
-                print "negProb", negProb
-                print "posProb", posProb
+                # print "negProb", negProb
+                # print "posProb", posProb
                 negProb *= float(negDict[word] / total)
-                print "newnegProb", negProb
+                # print "newnegProb", negProb
         if (posProb > negProb):
             return 'positive'
         elif (negProb > posProb):
