@@ -64,7 +64,7 @@ class Bayes_Classifier:
         priorNeg = float(2735)/float(13864)
         total = float(13864)
         token = self.tokenize(sText)
-        print token
+#        print token
         for word in token:
             if word in self.posDict:
                 if (posProb == float(0)):

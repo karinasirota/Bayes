@@ -6,8 +6,6 @@
 
 import math, os, pickle, re
 
-posDict = {}
-negDict = {}
 class Bayes_Classifier:
     
     def __init__(self):
@@ -15,7 +13,13 @@ class Bayes_Classifier:
       cache of a trained classifier has been stored, it loads this cache.  Otherwise, 
       the system will proceed through training.  After running this method, the classifier 
       is ready to classify input text."""
-        self.train()
+        if (os.path.exists("negative.txt") and os.path.exists("positive.txt")):
+            self.posDict = self.load("positive.txt")
+            self.negDict = self.load("negative.txt")
+        else:
+            self.posDict = {}
+            self.negDict = {}
+            self.train()
     
     def train(self):
         """Trains the Naive Bayes Sentiment Classifier."""
@@ -31,35 +35,35 @@ class Bayes_Classifier:
                 if (star == '5'):
                     for word in token:
                         posEntry = {word: 1}
-                        if word in posDict:
-                            posDict[word] += 1
+                        if word in self.posDict:
+                            self.posDict[word] += 1
                         else:
-                            posDict.update(posEntry)
+                            self.posDict.update(posEntry)
                 else:
                     for word in token:
                         negEntry = {word: 1}
-                        if word in negDict:
-                            negDict[word] += 1
+                        if word in self.negDict:
+                            self.negDict[word] += 1
                         else:
-                            negDict.update(negEntry)
+                            self.negDict.update(negEntry)
                 test = [i+' '+j for i,j in zip(token[::2], token[1::2])]
                 if (star == '5'):
                     for word in test:
                         posEntry = {word: 1}
-                        if word in posDict:
-                            posDict[word] += 1
+                        if word in self.posDict:
+                            self.posDict[word] += 1
                         else:
-                            posDict.update(posEntry)
+                            self.posDict.update(posEntry)
                 else:
                     for word in test:
                         negEntry = {word: 1}
-                        if word in negDict:
-                            negDict[word] += 1
+                        if word in self.negDict:
+                            self.negDict[word] += 1
                         else:
-                            negDict.update(negEntry)
-        self.save(negDict, "negative.txt")
-        self.save(posDict, "positive.txt")
-        return posDict, negDict 
+                            self.negDict.update(negEntry)
+        self.save(self.negDict, "negative.txt")
+        self.save(self.posDict, "positive.txt")
+#        return posDict, negDict 
             
     
     def classify(self, sText):
@@ -67,28 +71,35 @@ class Bayes_Classifier:
       class to which the target string belongs (i.e., positive, negative or neutral).
       """
         posProb = float(0)
+        priorPos = float(11129)/float(13864)
         negProb = float(0)
+        priorNeg = float(2735)/float(13864)
         total = float(13864)
         token = self.tokenize(sText)
+        print
         test = [i+' '+j for i,j in zip(token[::2], token[1::2])]
         if (len(token)%2 == 1):
-           test.append(token[len(token) - 1])
+            test.append(token[len(token) - 1])
 
         for word in test:
-            if word in posDict:
+            if word in self.posDict:
                 if (posProb == float(0)):
-                    posProb = float(1)
+                    posProb = math.log(priorPos)
                 # print "negProb", negProb
                 # print "posProb", posProb
-                posProb *= float(posDict[word] / total)
+                posProb += math.log(float((self.posDict[word]+1) / total))
                 # print "newposProb", negProb
-            if word in negDict:
+            else:
+                posProb += math.log(float(1)/total)
+            if word in self.negDict:
                 if (negProb == float(0)):
-                    negProb = float(1)
+                    negProb = math.log(priorNeg)
                 # print "negProb", negProb
                 # print "posProb", posProb
-                negProb *= float(negDict[word] / total)
+                negProb += math.log(float((self.negDict[word]+1) / total))
                 # print "newnegProb", negProb
+            else:
+                negProb += math.log(float(1)/total)
         if (posProb > negProb):
             return 'positive'
         elif (negProb > posProb):
