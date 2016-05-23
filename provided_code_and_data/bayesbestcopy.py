@@ -4,8 +4,7 @@
 # All group members were present and contributing during all work on this project
 #
 
-import math, os, pickle, re, random
-
+import math, os, pickle, re
 
 class Bayes_Classifier:
     
@@ -22,38 +21,46 @@ class Bayes_Classifier:
             self.negDict = {}
             self.train()
     
-    
-    def train(self, inputData = 0):
+    def train(self):
         """Trains the Naive Bayes Sentiment Classifier."""
         
         IFileList = []
-        if (inputData == 0):
-            for fFileObj in os.walk("movies_reviews/"):
-                IFileList = fFileObj[2]
-                break
-        else: 
-            IFileList = inputData
-
-        for fileName in IFileList:
-            star = fileName[7]
-            #print star
-            review = self.loadFile("movies_reviews/"+fileName)
-            if (star == '5'):
-                posToken = self.tokenize(review)
-                for word in posToken:
-                    posEntry = {word: 1}
-                    if word in self.posDict:
-                        self.posDict[word] += 1
-                    else:
-                        self.posDict.update(posEntry)
-            else:
-                negToken = self.tokenize(review)
-                for word in negToken:
-                    negEntry = {word: 1}
-                    if word in self.negDict:
-                        self.negDict[word] += 1
-                    else:
-                        self.negDict.update(negEntry)
+        for fFileObj in os.walk("movies_reviews/"):
+            IFileList = fFileObj[2]
+            for fileName in IFileList:
+                star = fileName[7]
+                #print star
+                review = self.loadFile("movies_reviews/"+fileName)
+                token = self.tokenize(review)
+                if (star == '5'):
+                    for word in token:
+                        posEntry = {word: 1}
+                        if word in self.posDict:
+                            self.posDict[word] += 1
+                        else:
+                            self.posDict.update(posEntry)
+                else:
+                    for word in token:
+                        negEntry = {word: 1}
+                        if word in self.negDict:
+                            self.negDict[word] += 1
+                        else:
+                            self.negDict.update(negEntry)
+                test = [i+' '+j for i,j in zip(token[::2], token[1::2])]
+                if (star == '5'):
+                    for word in test:
+                        posEntry = {word: 1}
+                        if word in self.posDict:
+                            self.posDict[word] += 1
+                        else:
+                            self.posDict.update(posEntry)
+                else:
+                    for word in test:
+                        negEntry = {word: 1}
+                        if word in self.negDict:
+                            self.negDict[word] += 1
+                        else:
+                            self.negDict.update(negEntry)
         self.save(self.negDict, "negative.txt")
         self.save(self.posDict, "positive.txt")
 #        return posDict, negDict 
@@ -69,8 +76,12 @@ class Bayes_Classifier:
         priorNeg = float(2735)/float(13864)
         total = float(13864)
         token = self.tokenize(sText)
-#        print token
-        for word in token:
+        print
+        test = [i+' '+j for i,j in zip(token[::2], token[1::2])]
+        if (len(token)%2 == 1):
+            test.append(token[len(token) - 1])
+
+        for word in test:
             if word in self.posDict:
                 if (posProb == float(0)):
                     posProb = math.log(priorPos)
@@ -140,77 +151,3 @@ class Bayes_Classifier:
             lTokens.append(sToken)
 
         return lTokens
-
-    def validate(self):
-        trainingData = []
-        testingData = []
-        positiveData = []
-        negativeData = []
-        totalRecall = 0
-        totalPrecision = 0
-        totalFMeasure = 0 
-
-        for fFileObj in os.walk("movies_reviews/"):
-            trainingData = fFileObj[2]
-            break
-        
-        negativeData = trainingData[:2735]
-        positiveData = trainingData[2635:]
-            
-        for i in range(100):
-            print "Current Iteration:", i 
-            truePositive = 0
-            trueNegative = 0
-            falsePositive = 0
-            falseNegative = 0
-            totalPositive = 0
-            totalNegative = 0
-
-            #make random
-            random.shuffle(positiveData)
-            random.shuffle(negativeData)
-            #choose 10% testing data
-            positiveTestData = positiveData[0:(len(positiveData)/10)]
-            negativeTestData = negativeData[0:(len(negativeData)/10)]
-            testingData = positiveTestData + negativeTestData
-            #remove testing from training
-            trainingData = [x for x in trainingData if x not in testingData]
-            print "Training data"
-
-            self.train(inputData = trainingData)
-
-            for fileName in testingData:
-                
-                review = self.loadFile("movies_reviews/"+fileName)
-                result = self.classify(review)
-
-                if result == 'positive':
-                    if (fileName[7] == '5'):
-                        truePositive += 1
-                    else:
-                        falsePositive += 1
-                    totalPositive +=1
-                if result == 'negative':
-                    if (fileName[7] == '1'):
-                        trueNegative += 1
-                    else:
-                        falseNegative += 1 
-                    totalNegative += 1
-
-
-            #recall= fraction of correctly classification
-            recall = float(truePositive) / float(truePositive + falseNegative)
-            totalRecall = totalRecall + recall
-            print "totalrecall", float(totalRecall / 10)
-            
-            #Precision: faction of assigned to I to total about I 
-            precision = float(truePositive) / float(truePositive + falsePositive)
-            totalPrecision = totalPrecision + precision
-            print "Precision", float(totalPrecision / 10)
-
-            #2PR/(P+R)
-            fmeasure = 2 * (float(precision) * float(recall)) / float(precision + recall)
-            totalFMeasure = totalFMeasure + fmeasure
-            print "fmeasure",  float(totalFMeasure / 10) 
-
-

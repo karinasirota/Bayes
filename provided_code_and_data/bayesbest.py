@@ -64,7 +64,7 @@ class Bayes_Classifier:
                             self.negDict.update(negEntry)
         self.save(self.negDict, "negative.txt")
         self.save(self.posDict, "positive.txt")
-       # return posDict, negDict 
+        # return posDict, negDict 
             
     
     def classify(self, sText):
@@ -176,6 +176,8 @@ class Bayes_Classifier:
     def validate(self):
         trainingData = []
         testingData = []
+        positiveData = []
+        negativeData = []
         totalRecall = 0
         totalPrecision = 0
         totalFMeasure = 0 
@@ -183,8 +185,11 @@ class Bayes_Classifier:
         for fFileObj in os.walk("movies_reviews/"):
             trainingData = fFileObj[2]
             break
-
-        for i in range(10):
+        
+        negativeData = trainingData[:2735]
+        positiveData = trainingData[2635:]
+            
+        for i in range(100):
             print "Current Iteration:", i 
             truePositive = 0
             trueNegative = 0
@@ -193,13 +198,15 @@ class Bayes_Classifier:
             totalPositive = 0
             totalNegative = 0
 
-
             #make random
-            random.shuffle(trainingData)
+            random.shuffle(positiveData)
+            random.shuffle(negativeData)
             #choose 10% testing data
-            testingData = trainingData[0:(len(trainingData)/10)]
+            positiveTestData = positiveData[0:(len(positiveData)/10)]
+            negativeTestData = negativeData[0:(len(negativeData)/10)]
+            testingData = positiveTestData + negativeTestData
             #remove testing from training
-            [x for x in testingData if x not in trainingData]
+            trainingData = [x for x in trainingData if x not in testingData]
             print "Training data"
 
             self.train(inputData = trainingData)
