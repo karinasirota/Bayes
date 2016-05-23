@@ -197,10 +197,10 @@ class Bayes_Classifier:
                         falseNegative += 1 
                     totalNegative += 1
 
-
             #recall= fraction of correctly classification
             recall = float(truePositive) / float(truePositive + falseNegative)
             totalRecall = totalRecall + recall
+
             print "totalrecall", float(totalRecall / 10)
             
             #Precision: faction of assigned to I to total about I 
@@ -212,5 +212,3 @@ class Bayes_Classifier:
             fmeasure = 2 * (float(precision) * float(recall)) / float(precision + recall)
             totalFMeasure = totalFMeasure + fmeasure
             print "fmeasure",  float(totalFMeasure / 10) 
-
-

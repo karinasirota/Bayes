@@ -13,9 +13,9 @@ class Bayes_Classifier:
       cache of a trained classifier has been stored, it loads this cache.  Otherwise, 
       the system will proceed through training.  After running this method, the classifier 
       is ready to classify input text."""
-        if (os.path.exists("negative.txt") and os.path.exists("positive.txt")):
-            self.posDict = self.load("positive.txt")
-            self.negDict = self.load("negative.txt")
+        if (os.path.exists("negative2.txt") and os.path.exists("positive2.txt")):
+            self.posDict = self.load("positive2.txt")
+            self.negDict = self.load("negative2.txt")
         else:
             self.posDict = {}
             self.negDict = {}
@@ -62,8 +62,8 @@ class Bayes_Classifier:
                             self.negDict[word] += 1
                         else:
                             self.negDict.update(negEntry)
-        self.save(self.negDict, "negative.txt")
-        self.save(self.posDict, "positive.txt")
+        self.save(self.negDict, "negative2.txt")
+        self.save(self.posDict, "positive2.txt")
         # return posDict, negDict 
             
     
