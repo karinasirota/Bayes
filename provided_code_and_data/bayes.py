@@ -177,29 +177,33 @@ class Bayes_Classifier:
                 review = self.loadFile("movies_reviews/"+fileName)
                 result = self.classify(review)
                 if result == 'positive':
-                 if (fileName[7] == '5'):
-                     truePositive += 1
-                 else:
-                     falsePositive += 1
-                     totalPositive +=1
-                     if result == 'negative':
-                         if (fileName[7] == '1'):
-                             trueNegative += 1
-                         else:
-                             falseNegative += 1 
-                             totalNegative += 1
+                    if (fileName[7] == '5'):
+                        truePositive += 1
+                    else:
+                        falsePositive += 1
+                    totalPositive +=1
+                if result == 'negative':
+                    if (fileName[7] == '1'):
+                        trueNegative += 1
+                    else:
+                        falseNegative += 1 
+                    totalNegative += 1
 
             #recall= fraction of correctly classification
-            recall = float(truePositive) / float(totalPositive)
+            recall = float(truePositive) / float(truePositive + falseNegative)
             totalRecall = totalRecall + recall
-            print "recall", float(totalRecall / 10)
+            print "truePositive", truePositive
+            print "falsePositive", falsePositive
+            print "trueNegative", trueNegative
+            print "falseNegative", falseNegative
+            print "totalrecall", float(totalRecall / 10)
             
             #Precision: faction of assigned to I to total about I 
             precision = float(truePositive) / float(truePositive + falsePositive)
             totalPrecision = totalPrecision + precision
-            print "Precision", float( totalPrecision / 10)
+            print "Precision", float(totalPrecision / 10)
 
             #2PR/(P+R)
             fmeasure = 2 * (float(precision) * float(recall)) / float(precision + recall)
             totalFMeasure = totalFMeasure + fmeasure
-            print "fmeasure",  float( totalFMeasure / 10) 
+            print "fmeasure",  float(totalFMeasure / 10) 
