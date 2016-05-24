@@ -189,7 +189,7 @@ class Bayes_Classifier:
         negativeData = trainingData[:2735]
         positiveData = trainingData[2635:]
             
-        for i in range(100):
+        for i in range(10):
             print "Current Iteration:", i 
             truePositive = 0
             trueNegative = 0
@@ -225,6 +225,7 @@ class Bayes_Classifier:
                 if result == 'negative':
                     if (fileName[7] == '1'):
                         trueNegative += 1
+                        print fileName
                     else:
                         falseNegative += 1 
                     totalNegative += 1
